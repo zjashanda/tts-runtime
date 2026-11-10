@@ -1,0 +1,18 @@
+{
+  "schema": "ark.tts-job.v1",
+  "name": "example-batch",
+  "engine": "mock",
+  "language": "ZH",
+  "workers": 2,
+  "items": [
+    {
+      "id": "greeting",
+      "text": "你好，这是 tts-runtime 的示例任务。"
+    },
+    {
+      "id": "notice",
+      "text": "云端引擎用 lstts，本地引擎用 melotts，离线自检用 mock。",
+      "voice": "tone-880"
+    }
+  ]
+}

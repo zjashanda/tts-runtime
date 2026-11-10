@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ark.example/schemas/tts-request.v1.json",
+  "title": "ark.tts-request.v1",
+  "description": "一次合成请求。字段只增不减；校验时允许额外键。URL/token 不属于本契约。",
+  "type": "object",
+  "required": ["schema", "text"],
+  "additionalProperties": true,
+  "properties": {
+    "schema": { "const": "ark.tts-request.v1" },
+    "text": { "type": "string", "minLength": 1 },
+    "output": { "type": "string", "description": "输出 wav 路径" },
+    "engine": { "enum": ["auto", "lstts", "melotts", "mock"] },
+    "voice": { "type": "string", "description": "内置音色名 / 音色 wav 路径 / melotts speaker id" },
+    "emotion": { "type": "string", "description": "情感参考音频路径（仅 lstts）" },
+    "language": { "enum": ["ZH", "EN"] },
+    "speed": { "type": "number", "exclusiveMinimum": 0 },
+    "timeout_s": { "type": "number", "exclusiveMinimum": 0 },
+    "validate": { "type": "boolean", "default": true },
+    "id": { "type": "string", "description": "批量任务里的条目 id" }
+  }
+}

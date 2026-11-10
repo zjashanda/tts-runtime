@@ -1,0 +1,23 @@
+{
+  "schema": "ark.env-keys.v1",
+  "note": "本文件只登记变量名，值一律是占位符 <env>；永远不放真实凭据。URL 与 token 只从环境变量读取。",
+  "placeholder": "<env>",
+  "keys": {
+    "TTS_RUNTIME_LSTTS_URL": "<env>",
+    "TTS_RUNTIME_LSTTS_TOKEN": "<env>",
+    "TTS_RUNTIME_VOICE_DIR": "<env>",
+    "TTS_RUNTIME_TIMEOUT": "<env>",
+    "TTS_RUNTIME_ENGINE": "<env>",
+    "TTS_RUNTIME_LANGUAGE": "<env>",
+    "TTS_RUNTIME_CONFIG": "<env>",
+    "TTS_RUNTIME_WORK": "<env>",
+    "LSTTS_TTS_URL": "<env>",
+    "LSTTS_TTS_TOKEN": "<env>",
+    "LSTEST_TTS_URL": "<env>",
+    "LSTEST_TTS_TOKEN": "<env>",
+    "LSTEST_TTS_TIMEOUT": "<env>",
+    "LSTEST_VOICE_DIR": "<env>",
+    "MELOTTS_HOME": "<env>",
+    "MELOTTS_PYTHON": "<env>"
+  }
+}

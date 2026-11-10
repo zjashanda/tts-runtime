@@ -1,0 +1,10 @@
+{
+  "schema": "ark.tts-runtime-config.v1",
+  "engine": "auto",
+  "language": "ZH",
+  "speed": 1.0,
+  "timeout_s": 30,
+  "validate": true,
+  "workers": 4,
+  "voice": null
+}

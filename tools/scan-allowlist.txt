@@ -1,0 +1,25 @@
+# tools/scan-allowlist.txt —— 敏感信息扫描白名单（每行一个正则）
+#
+# 只允许两类例外：
+#   1) 变量名占位写法，值必须是 <env>
+#   2) 文档里明确标注为示例的变量名
+#
+# 任何真实 token / 密码 / 私钥都不得靠白名单放行。
+
+# 变量名后面的值只能是 <env> 占位
+\b[A-Z][A-Z0-9_]*(?:PASSWORD|PASSWD|TOKEN|SECRET|ACCESS_KEY)[A-Z0-9_]*\s*[=:]\s*["']?<env>
+
+# 文档里的占位写法：password: <env>
+\b(?:password|passwd|token|secret)\s*[=:]\s*<env>
+
+# 明确的示例变量名（不带值）
+config/env-keys\.json
+
+# Python 类型注解：token: Optional[str] = None —— 没有值
+(?i)(?:password|passwd|secret|token|access_key)\s*:\s*(?:Optional|str|Any|object)\b
+
+# 从环境/对象取值：token = self._token()、token = request.token —— 没有字面量
+(?i)(?:password|passwd|secret|token|access_key)\s*=\s*(?:self|request|os|job|item|config|exc|engine)\.
+
+# 环境变量名 = 同文件里的 Python 变量（无字面量）：TTS_RUNTIME_LSTTS_TOKEN=secret)
+\b[A-Z][A-Z0-9_]*(?:PASSWORD|PASSWD|TOKEN|SECRET|ACCESS_KEY)[A-Z0-9_]*\s*=\s*[a-z_][a-z0-9_]*\s*[),]

@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ark.example/schemas/tts-result.v1.json",
+  "title": "ark.tts-result.v1",
+  "description": "一次合成的结果。失败时 ok=false、audio=null、error 给出稳定错误码。",
+  "type": "object",
+  "required": ["schema", "ok", "engine"],
+  "additionalProperties": true,
+  "properties": {
+    "schema": { "const": "ark.tts-result.v1" },
+    "ok": { "type": "boolean" },
+    "engine": { "enum": ["lstts", "melotts", "mock"] },
+    "voice": { "type": ["string", "null"] },
+    "language": { "type": ["string", "null"] },
+    "text_chars": { "type": "integer", "minimum": 0 },
+    "audio_path": { "type": ["string", "null"] },
+    "audio": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["container", "codec", "sample_rate", "channels", "duration_seconds"],
+          "additionalProperties": true,
+          "properties": {
+            "container": { "type": "string" },
+            "codec": { "type": "string" },
+            "sample_rate": { "type": "integer", "minimum": 1 },
+            "channels": { "type": "integer", "minimum": 1 },
+            "sample_width": { "type": "integer", "minimum": 1 },
+            "frames": { "type": "integer", "minimum": 0 },
+            "duration_seconds": { "type": "number", "minimum": 0 },
+            "peak_dbfs": { "type": ["number", "null"] },
+            "mean_db": { "type": ["number", "null"] },
+            "clip_ratio": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      ]
+    },
+    "started_at": { "type": "string", "description": "北京时间展示格式 YYYY-MM-DD HH:MM:SS" },
+    "finished_at": { "type": ["string", "null"] },
+    "elapsed_s": { "type": "number", "minimum": 0 },
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "error": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["code", "message"],
+          "additionalProperties": true,
+          "properties": {
+            "code": { "enum": ["USAGE", "FAIL", "UNSUPPORTED", "BACKEND"] },
+            "message": { "type": "string" },
+            "engine": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "id": { "type": "string" }
+  }
+}

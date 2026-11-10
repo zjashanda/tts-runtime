@@ -1,0 +1,64 @@
+# .gitignore —— 污染治理是第一验收项
+# 虚拟环境 / 模型 / 依赖副本一律不入库（melotts 旧 skill 里这几项目前合计数百 MB）
+
+# --- 虚拟环境 ---
+.venv/
+venv/
+env/
+ENV/
+.conda/
+__pycache__/
+
+# --- 依赖与模型（绝不入库）---
+vendor/
+models/
+nltk_data/
+checkpoints/
+*.pth
+*.pt
+*.bin
+*.onnx
+*.so
+*.so.*
+*.dylib
+*.dll
+*.a
+
+# --- 生成资产 ---
+outputs/
+out/
+*.wav
+*.mp3
+*.flac
+*.m4a
+*.ogg
+*.zip
+!tests/fixtures/*.wav
+
+# --- 凭据 / 本地配置 ---
+.git-credentials
+auth.json
+.env
+.env.*
+*.local.json
+.local/
+
+# --- 构建产物 ---
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- 编辑器与系统噪音 ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini

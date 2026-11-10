@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ark.example/schemas/tts-voice.v1.json",
+  "title": "ark.tts-voice.v1",
+  "description": "一个可用音色的描述。path 是本机路径，不承诺跨节点一致。",
+  "type": "object",
+  "required": ["schema", "name", "engine"],
+  "additionalProperties": true,
+  "properties": {
+    "schema": { "const": "ark.tts-voice.v1" },
+    "name": { "type": "string", "minLength": 1 },
+    "engine": { "enum": ["lstts", "melotts", "mock"] },
+    "kind": { "enum": ["builtin", "reference", "speaker", "synthetic"] },
+    "path": { "type": "string" },
+    "languages": { "type": "array", "items": { "enum": ["ZH", "EN"] } }
+  }
+}

@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tts-runtime"
+version = "0.1.0"
+description = "Canonical TTS runtime: one stable interface over cloud IndexTTS (lstts), local MeloTTS and an offline mock"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Ark / zjashanda" }]
+keywords = ["tts", "speech", "melotts", "indextts", "lstts", "ark"]
+dependencies = []
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
+  "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+
+[project.scripts]
+tts-runtime = "tts_runtime.cli:main"
+
+[tool.setuptools]
+packages = ["tts_runtime", "tts_runtime.engines"]
+
+[tool.setuptools.package-data]
+tts_runtime = ["py.typed"]
