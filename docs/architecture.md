@@ -48,7 +48,8 @@ CLI / Python API
 
 ## 时间与编码
 
-- 时间统一北京时间、无时区后缀：`YYYY-MM-DDThh:mm:ss.sss`。
+- 时间统一北京时间、无时区后缀：`YYYY-MM-DD HH:MM:SS`。展示字段与机器可读字段共用同一格式，生成侧只有 `util.format_time()` 一个出口；外部原始时间仅落在 `raw_*` 字段并先经 `parse_raw_time()` 归一化。
+- `tools/time_lint.py` 扫描代码、schema、文档中的 T 分隔、Z 后缀、时区偏移、亚秒位与 date-time 格式，作为发布门禁的一部分。
 - 文本读取自动识别 `utf-8-sig` → `gb18030` → `utf-16`。
 - JSON 输出 UTF-8、缩进 2、不转义中文；写文件用临时文件 + `os.replace` 原子替换。
 

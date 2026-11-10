@@ -2,6 +2,19 @@
 
 旧仓库**不删除、不改 main**。本文件只描述如何把调用方切到新入口，旧仓库保留为只读对照。
 
+## 0. 从 0.1.0 升到 0.1.1（时间契约）
+
+0.1.0 曾同时暴露展示格式与带偏移的机器格式。0.1.1 起只有一种时间格式：`YYYY-MM-DD HH:MM:SS`（北京时间，无时区后缀）。
+
+| 0.1.0 | 0.1.1 |
+|---|---|
+| `util.format_display(dt)` | `util.format_time(dt)`；`format_display` 仍是等价别名 |
+| `util.format_rfc3339(dt)` | **已删除**；改用 `util.format_time(dt)` |
+| `util.parse_time(text)` | `util.parse_raw_time(text)`，仅用于 `raw_*` 外部原始时间 |
+| schema 里靠描述文字约定时间 | `pattern` 硬约束；`tools/time_lint.py --gate` 强制 |
+
+如果下游解析过 0.1.0 输出的带偏移时间，直接把解析器改成契约格式即可，无需处理时区换算。
+
 ## 1. 命令对照
 
 ### lstts（云端 IndexTTS）

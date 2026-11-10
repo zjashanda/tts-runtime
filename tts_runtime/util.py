@@ -2,9 +2,13 @@
 
 时间契约（全仓库唯一口径，与 ark-node / asset-tools / device-io 一致）
 ---------------------------------------------------------------------
-* 对外展示：北京时间，**无时区后缀**，``YYYY-MM-DD HH:MM:SS``
-* 机器可读：RFC3339，``YYYY-MM-DDTHH:MM:SS+0800``
-* 文件名：``YYYYMMDD-HHMMSS``
+* 对外展示、机器可读 JSON、日志、回执、文档示例：**同一种格式**，
+  北京时间、无时区后缀，``YYYY-MM-DD HH:MM:SS``。
+* 生成侧只有一个出口 :func:`format_time`；不得输出 ``T`` 分隔、``Z`` 后缀、
+  ``+08:00`` 偏移或带有亚秒位的变体。
+* 外部原始时间只在显式的 ``raw_*`` 字段里保留原样，读取时用
+  :func:`parse_raw_time` 归一化，禁止直接回显。
+* 文件名：``YYYYMMDD-HHMMSS``（仅文件名，不是任何对外时间字段）。
 
 脱敏铁律
 --------
@@ -27,8 +31,18 @@ from typing import Any, Iterable, List, Optional
 BEIJING = timezone(timedelta(hours=8))
 
 FMT_DISPLAY = "%Y-%m-%d %H:%M:%S"
-FMT_RFC3339 = "%Y-%m-%dT%H:%M:%S%z"
 FMT_STAMP = "%Y%m%d-%H%M%S"
+
+#: 契约时间格式（严格匹配，用于校验与 time lint）。
+TIME_CONTRACT_PATTERN = r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+TIME_CONTRACT_RE = re.compile(TIME_CONTRACT_PATTERN)
+
+#: 仅用于解析外部 ``raw_*`` 输入的历史格式；**不得用于输出**。
+_RAW_INPUT_FORMATS = (
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%dT%H:%M:%S%z",  # time-lint:allow 解析外部原始时间，不参与输出
+    "%Y-%m-%dT%H:%M:%S.%f%z",  # time-lint:allow 解析外部原始时间，不参与输出
+)
 
 # --------------------------------------------------------------------- 退出码
 
@@ -62,37 +76,45 @@ def _coerce(value: Optional[datetime]) -> datetime:
     return value.astimezone(BEIJING)
 
 
-def format_display(dt: Optional[datetime] = None) -> str:
-    """对外展示格式：``YYYY-MM-DD HH:MM:SS``（北京时间，无后缀）。"""
+def format_time(dt: Optional[datetime] = None) -> str:
+    """唯一时间出口：``YYYY-MM-DD HH:MM:SS``（北京时间，无时区后缀）。"""
     return _coerce(dt).strftime(FMT_DISPLAY)
 
 
-def format_rfc3339(dt: Optional[datetime] = None) -> str:
-    """机器可读格式：``YYYY-MM-DDTHH:MM:SS+0800``。"""
-    return _coerce(dt).strftime(FMT_RFC3339)
+#: 兼容旧调用名；与 :func:`format_time` 完全等价，输出同一格式。
+format_display = format_time
+
+
+def is_contract_time(text: Any) -> bool:
+    """判断字符串是否严格符合契约时间格式。"""
+    return bool(TIME_CONTRACT_RE.match(str(text or "")))
 
 
 def format_stamp(dt: Optional[datetime] = None) -> str:
-    """文件名时间戳：``YYYYMMDD-HHMMSS``。"""
+    """文件名时间戳：``YYYYMMDD-HHMMSS``（只用于文件名）。"""
     return _coerce(dt).strftime(FMT_STAMP)
 
 
-def parse_time(text: str) -> datetime:
-    """解析时间，接受展示格式与 RFC3339，返回带时区的 datetime。"""
+def parse_raw_time(text: str) -> datetime:
+    """解析**外部原始时间**，返回北京时间 aware datetime。
+
+    仅用于 ``raw_*`` 字段的归一化：接受契约格式与外部系统常见的带偏移写法，
+    解析结果必须再用 :func:`format_time` 输出，禁止把原始字符串回显到契约字段。
+    """
     raw = str(text or "").strip()
     if not raw:
         raise ValueError("空时间字符串")
-    try:
-        return datetime.strptime(raw, FMT_DISPLAY).replace(tzinfo=BEIJING)
-    except ValueError:
-        pass
     candidate = raw
     if candidate.endswith("Z") or candidate.endswith("z"):
         candidate = candidate[:-1] + "+0000"
-    try:
-        return datetime.strptime(candidate, FMT_RFC3339).astimezone(BEIJING)
-    except ValueError:
-        pass
+    for fmt in _RAW_INPUT_FORMATS:
+        try:
+            parsed = datetime.strptime(candidate, fmt)
+        except ValueError:
+            continue
+        if parsed.tzinfo is None:
+            return parsed.replace(tzinfo=BEIJING)
+        return parsed.astimezone(BEIJING)
     try:
         parsed = datetime.fromisoformat(candidate)
     except ValueError:

@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 0.1.1 — 2026-11-11
+
+统一时间契约修正：所有用户可见/机器可读输出只保留一种时间格式 `YYYY-MM-DD HH:MM:SS`（北京时间，无时区后缀）。
+
+### 变更
+
+- 新增 `util.format_time()` 作为唯一时间出口；`util.format_display` 保留为等价别名。
+- 删除 `util.format_rfc3339()` 与 `FMT_RFC3339`：不再输出 T 分隔、时区偏移或亚秒位。
+- `util.parse_time()` 更名为 `util.parse_raw_time()`，只用于 `raw_*` 外部原始时间的归一化。
+- `schemas/tts-result.v1.json` 的 `started_at` / `finished_at` 改用 `pattern` 约束，不再依赖描述文字。
+- 新增 `tools/time_lint.py` / `tools/time-lint.sh`，并把 time lint 接入 `tests/run-all.sh` 门禁。
+- README、`docs/architecture.md`、`docs/contracts.md` 的时间示例改为契约格式，并补时间契约章节。
+
 ## 0.1.0 — 2026-11-10
 
 首个公开版本，把 `lstts`（云端 IndexTTS）与 `melotts`（本地 MeloTTS）收敛到同一个运行时。

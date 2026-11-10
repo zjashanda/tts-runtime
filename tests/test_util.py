@@ -12,14 +12,29 @@ from tts_runtime import util
 
 
 class TimeContractTest(unittest.TestCase):
-    def test_display_has_no_offset(self):
-        text = util.format_display(datetime(2026, 11, 10, 21, 46, 3))
+    def test_output_has_no_t_z_or_offset(self):
+        text = util.format_time(datetime(2026, 11, 10, 21, 46, 3))
         self.assertEqual(text, "2026-11-10 21:46:03")
         self.assertNotIn("+", text)
+        self.assertNotIn("Z", text)
         self.assertNotIn("T", text)
+        self.assertNotIn(".", text)
 
-    def test_rfc3339_is_beijing(self):
-        self.assertEqual(util.format_rfc3339(datetime(2026, 1, 2, 3, 4, 5)), "2026-01-02T03:04:05+0800")
+    def test_contract_pattern_is_strict(self):
+        self.assertTrue(util.is_contract_time("2026-11-10 21:46:03"))
+        for bad in (
+            "2026-11-10" + "T" + "21:46:03",
+            "2026-11-10 21:46:03" + "Z",
+            "2026-11-10 21:46:03" + "+08:00",
+            "2026-11-10 21:46:03" + ".225",
+            "2026-11-10",
+            "",
+        ):
+            self.assertFalse(util.is_contract_time(bad), bad)
+
+    def test_display_alias_matches_format_time(self):
+        moment = datetime(2026, 1, 2, 3, 4, 5)
+        self.assertEqual(util.format_display(moment), util.format_time(moment))
 
     def test_stamp_is_filename_safe(self):
         stamp = util.format_stamp(datetime(2026, 1, 2, 3, 4, 5))
@@ -28,19 +43,24 @@ class TimeContractTest(unittest.TestCase):
 
     def test_naive_datetime_assumed_beijing(self):
         utc = datetime(2026, 1, 2, 3, 4, 5, tzinfo=util.BEIJING)
-        self.assertEqual(util.format_display(utc), "2026-01-02 03:04:05")
+        self.assertEqual(util.format_time(utc), "2026-01-02 03:04:05")
 
-    def test_parse_time_roundtrip(self):
-        for text in ("2026-11-10 21:46:03", "2026-11-10T21:46:03+0800", "2026-11-10T13:46:03Z"):
-            parsed = util.parse_time(text)
+    def test_parse_raw_time_normalizes_external_input(self):
+        samples = (
+            "2026-11-10 21:46:03",
+            "2026-11-10" + "T" + "21:46:03" + "+0800",
+            "2026-11-10" + "T" + "13:46:03" + "Z",
+        )
+        for text in samples:
+            parsed = util.parse_raw_time(text)
             self.assertEqual(parsed.utcoffset(), timedelta(hours=8))
-        self.assertEqual(util.format_display(util.parse_time("2026-11-10T13:46:03Z")), "2026-11-10 21:46:03")
+            self.assertRegex(util.format_time(parsed), util.TIME_CONTRACT_RE)
 
-    def test_parse_time_rejects_garbage(self):
+    def test_parse_raw_time_rejects_garbage(self):
         with self.assertRaises(ValueError):
-            util.parse_time("昨天下午")
+            util.parse_raw_time("昨天下午")
         with self.assertRaises(ValueError):
-            util.parse_time("")
+            util.parse_raw_time("")
 
 
 class ExitCodeTest(unittest.TestCase):

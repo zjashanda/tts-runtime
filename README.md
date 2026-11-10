@@ -125,7 +125,17 @@ print(report["ok"], report["notes"])
 
 ## 事件流
 
-`--events PATH` 输出 JSONL：`start` → `item_result`（批量每条一次）→ `complete`。所有时间戳为北京时间、无时区后缀（`YYYY-MM-DDThh:mm:ss.sss`）。
+## 时间契约
+
+所有时间字段——JSON、事件流、日志、回执和文档示例——只有一种格式：
+
+```
+YYYY-MM-DD HH:MM:SS
+```
+
+北京时间，无时区后缀，不带亚秒位。不输出 `T` 分隔、`Z` 后缀或 `+08:00` 偏移，schema 里也不用 date-time 格式，统一用 pattern 约束。外部系统给的原始时间只放在显式的 `raw_*` 字段，经 `parse_raw_time` 归一化后再输出。
+
+`--events PATH` 输出 JSONL：`start` → `item_result`（批量每条一次）→ `complete`，每条事件的 `at` 都是上述格式。仓库自带 `tools/time_lint.py` 门禁，违规时 `--gate` 退出 1。
 
 ## 仓库结构
 

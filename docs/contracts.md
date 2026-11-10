@@ -2,6 +2,10 @@
 
 所有对外结构都是 JSON，带 `schema` 字段。Schema 文件在 `schemas/`，`additionalProperties: true` 允许上层扩展，但下表字段是稳定契约。
 
+## 时间字段（全局）
+
+所有时间字段共用一种格式：`YYYY-MM-DD HH:MM:SS`，北京时间、无时区后缀、无亚秒位。schema 用 `pattern` 约束（不使用 date-time 格式）；事件流的 `at`、日志、回执与文档示例同此格式。外部原始时间只允许出现在显式的 `raw_*` 字段里，读取后经 `tts_runtime.util.parse_raw_time()` 归一化，禁止原样回显到契约字段。`tools/time_lint.py --gate` 在发布门禁中强制这一点。
+
 ## `ark.tts-request.v1`（请求）
 
 Python 侧由 `tts_runtime.models.Request` 构造，CLI 侧由参数映射。
@@ -25,7 +29,7 @@ Python 侧由 `tts_runtime.models.Request` 构造，CLI 侧由参数映射。
 | `schema` | const | `ark.tts-result.v1` |
 | `engine` | enum | `lstts`/`melotts`/`mock` |
 | `ok` | boolean | 是否成功 |
-| `started_at` / `finished_at` | string | 北京时间，无时区后缀 |
+| `started_at` / `finished_at` | string | 北京时间，无时区后缀，`YYYY-MM-DD HH:MM:SS`（schema `pattern` 约束） |
 | `elapsed_s` | number | 耗时秒 |
 | `voice` / `language` | string? | 实际使用值 |
 | `text_chars` | number | 文本字符数 |

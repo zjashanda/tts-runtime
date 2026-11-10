@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from .core import (  # noqa: E402  (版本号必须先定义，供 core 引用)
     available_engines,

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tts-runtime"
-version = "0.1.0"
+version = "0.1.1"
 description = "Canonical TTS runtime: one stable interface over cloud IndexTTS (lstts), local MeloTTS and an offline mock"
 readme = "README.md"
 requires-python = ">=3.9"
